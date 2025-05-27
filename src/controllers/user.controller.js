@@ -71,6 +71,7 @@ const loginUser = async (req, res) => {
 
 const userData = (req, res) => {
     try {
+        // `username` et `email` injectés dans req par le middleware d'authentification
         const username = req.username;
         const email = req.email;
         res.status(200).json({
