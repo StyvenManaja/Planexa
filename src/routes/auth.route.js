@@ -3,7 +3,10 @@ const authController = require('../controllers/auth.controller');
 
 const router = express.Router();
 
-router.get('/api/refresh-token', authController.refreshToken);  //rafraichir le token à son expiration
-router.post('/api/user/logout', authController.logout);  //déconnexion de l'utilisateur
+// Route pour rafraîchir le token JWT à expiration
+router.get('/api/refresh-token', authController.refreshToken);
+
+// Route pour déconnecter l'utilisateur (clear cookies)
+router.post('/api/user/logout', authController.logout);
 
 module.exports = router;

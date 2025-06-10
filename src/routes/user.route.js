@@ -5,11 +5,13 @@ const authenticate = require('../middlewares/authentication');
 
 const router = express.Router();
 
-//valider toutes les entrés avant de passer aux autres controller
+// Validation des données avant inscription
 router.post('/api/user/signup', userValidator.signupValidator, userController.registerUser);
+
+// Validation des données avant connexion
 router.post('/api/user/login', userValidator.loginValidator, userController.loginUser);
 
-//a protected route to get the user data
+// Route protégée : récupération des infos utilisateur
 router.get('/api/user', authenticate, userController.userData);
 
 module.exports = router;

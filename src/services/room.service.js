@@ -2,51 +2,36 @@ const roomRepository = require('../repositories/room.repository');
 
 const createRoom = async (name, volume, equipments) => {
     try {
-        const roomData = {
-            name: name,
-            volume: volume,
-            equipments: equipments
-        }
+        const roomData = { name, volume, equipments };
         const room = await roomRepository.createRoom(roomData);
-        if(!room) { return null };
-        return room;
+        // Si création échoue, retourne null (ou on peut même lancer une erreur, selon ton besoin)
+        return room || null;
     } catch (error) {
-        console.log('An error occured when registering room: ', error.message);
-        throw new Error('Error: ', error.message);
+        console.error('Error occurred when registering room:', error.message);
+        throw new Error(error.message);
     }
 }
 
 const getAllRoom = async () => {
     try {
         const roomList = await roomRepository.getAllRoom();
-        if(!roomList) { return null };
-        return roomList;
+        // Une liste vide ça peut arriver, donc on peut juste retourner l’array, pas besoin de null
+        return roomList || [];
     } catch (error) {
-        console.log('An error occured when finding all room: ', error.message);
-        throw new Error('Error: ', error.message);
-    }
-}
-
-const bookARoom = async (id, hours) => {
-    try {
-        const roomBooked = await roomRepository.bookARoom(id, hours);
-        if(!roomBooked) { return null };
-        return roomBooked;
-    } catch (error) {
-        console.log('An error occured when booking the room: ', error);
-        throw new Error('Error: ', error);
+        console.error('Error occurred when finding all rooms:', error.message);
+        throw new Error(error.message);
     }
 }
 
 const deleteRoom = async (id) => {
     try {
         const deleted = await roomRepository.deleteRoom(id);
-        if(!deleted) { return false };
-        return true;
+        // Si suppression foire, renvoie false, sinon true
+        return !!deleted;
     } catch (error) {
-        console.log('An error occured when deleting room: ', error);
-        throw new Error('Error: ', error);
+        console.error('Error occurred when deleting room:', error.message);
+        throw new Error(error.message);
     }
 }
 
-module.exports = { createRoom, getAllRoom, bookARoom, deleteRoom };
+module.exports = { createRoom, getAllRoom, deleteRoom };

@@ -1,52 +1,54 @@
 const Room = require('../models/Room');
 
+/**
+ * Crée une nouvelle salle en base
+ * @param {Object} roomData - données de la salle { name, volume, equipments }
+ * @throws {Error} si le nom est déjà utilisé ou autre erreur base
+ * @returns {Promise<Object>} la salle créée
+ */
 const createRoom = async (roomData) => {
     try {
-        const room = await Room.create({
-            name: roomData.name,
-            volume: roomData.volume,
-            equipments: roomData.equipments,
-        })
+        const room = await Room.create(roomData);
         return room;
     } catch (error) {
-        if(error.code === 11000) {
+        // Gestion spécifique de l'erreur de doublon MongoDB (code 11000)
+        if (error.code === 11000) {
             throw new Error('Name already in use.');
         }
+        // Rethrow pour ne pas masquer l’erreur d’origine
         throw error;
     }
-}
+};
 
+/**
+ * Récupère toutes les salles en base
+ * @returns {Promise<Array>} liste des salles
+ * @throws {Error} en cas de problème de lecture
+ */
 const getAllRoom = async () => {
     try {
-        const roomList = await Room.find();
-        return roomList;
+        return await Room.find();
     } catch (error) {
-        throw new Error('Error on finding all room: ' + error.message);
+        throw new Error(`Error on finding all rooms: ${error.message}`);
     }
-}
+};
 
-const bookARoom = async (id, hours) => {
-    try {
-        const room = await Room.findById(id);
-        hours.forEach(hour => {
-            if(room.availability.hasOwnProperty(hour)) {
-                room.availability[hour] = false;
-            }
-        });
-        await room.save();
-        return room;
-    } catch (error) {
-        throw new Error('Error on booking the room: ' + error.message);
-    }
-}
-
+/**
+ * Supprime une salle par son ID
+ * @param {String} id - ID MongoDB de la salle
+ * @returns {Promise<Boolean>} true si suppression OK
+ * @throws {Error} en cas d’erreur
+ */
 const deleteRoom = async (id) => {
     try {
-        await Room.findByIdAndDelete(id);
+        const deleted = await Room.findByIdAndDelete(id);
+        if (!deleted) {
+            throw new Error('Room not found.');
+        }
         return true;
     } catch (error) {
-        throw new Error('Error on deleting room: ' + error.message);
+        throw new Error(`Error on deleting room: ${error.message}`);
     }
-}
+};
 
-module.exports = { createRoom, getAllRoom, bookARoom, deleteRoom };
+module.exports = { createRoom, getAllRoom, deleteRoom };

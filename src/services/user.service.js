@@ -1,39 +1,37 @@
 const userRepository = require('../repositories/user.repository');
 
-//création de l'utilisateur
+// Création utilisateur
 const registerUser = async (username, email, password, role) => {
     try {
-        const userData = {
-            username: username,
-            email: email,
-            password: password,
-            role: role
-        }
-    
+        const userData = { username, email, password, role };
         const user = await userRepository.registerUser(userData);
+
         return {
+            id: user.id,
             username: user.username,
-            email: user.email
-        }
+            email: user.email,
+        };
     } catch (error) {
-        throw new Error('Error: ' + error.message);
+        throw new Error(error.message);
     }
 }
 
-//connexion de l'utilisateur
+// Connexion utilisateur
 const loginUser = async (email, password) => {
     try {
         const user = await userRepository.loginUser(email);
-        if(user && (await user.matchPassword(password))) {  //vérifie si l'utilisateur existe et si le mdp est bon
+
+        if (user && await user.matchPassword(password)) {
             return {
+                id: user.id,
                 username: user.username,
-                email: user.email
-            }
-        } else {
-            return null;    //si non, on renvoi rien
+                email: user.email,
+            };
         }
+
+        return null;
     } catch (error) {
-        throw new Error('Error: ' + error.message);
+        throw new Error(error.message);
     }
 }
 
