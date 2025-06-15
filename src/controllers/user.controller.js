@@ -15,8 +15,8 @@ const registerUser = async (req, res) => {
         }
 
         // Génération des tokens JWT
-        const accessToken = tokenGenerator.generateAccessToken(user.id, user.username, user.email);
-        const refreshToken = tokenGenerator.generateRefreshToken(user.id, user.username, user.email);
+        const accessToken = tokenGenerator.generateAccessToken(user.id, user.username, user.role);
+        const refreshToken = tokenGenerator.generateRefreshToken(user.id, user.username, user.role);
 
         // Envoi sécurisé des tokens via cookies
         res.cookie('accessToken', accessToken, {
@@ -55,8 +55,8 @@ const loginUser = async (req, res) => {
         }
 
         // Génération des tokens JWT
-        const accessToken = tokenGenerator.generateAccessToken(user.id, user.username, user.email);
-        const refreshToken = tokenGenerator.generateRefreshToken(user.id, user.username, user.email);
+        const accessToken = tokenGenerator.generateAccessToken(user.id, user.username, user.role);
+        const refreshToken = tokenGenerator.generateRefreshToken(user.id, user.username, user.role);
 
         // Envoi sécurisé des tokens via cookies
         res.cookie('accessToken', accessToken, {
@@ -86,13 +86,12 @@ const loginUser = async (req, res) => {
  */
 const userData = (req, res) => {
     try {
-        const { id, username, email } = req.user;
+        const { id, username } = req.user;
 
         res.status(200).json({
             user: {
                 id,
-                username,
-                email
+                username
             }
         });
     } catch (error) {

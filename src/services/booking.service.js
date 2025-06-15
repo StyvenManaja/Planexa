@@ -24,4 +24,15 @@ const checkAvailableSlot = async (roomId, date) => {
     }
 }
 
-module.exports = { bookingARoom, checkAvailableSlot };
+// Récuperer les réservation d'un utilisateur
+const getMyBooking = async (roomId) => {
+    try {
+        // Appel au repository pour récuperer les résa
+        return await bookingRepository.getMyBooking(roomId);
+    } catch (error) {
+        console.error('Error on finding all booking:', error.message);
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { bookingARoom, checkAvailableSlot, getMyBooking };

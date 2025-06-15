@@ -9,7 +9,7 @@ const registerUser = async (username, email, password, role) => {
         return {
             id: user.id,
             username: user.username,
-            email: user.email,
+            role: user.role
         };
     } catch (error) {
         throw new Error(error.message);
@@ -25,7 +25,7 @@ const loginUser = async (email, password) => {
             return {
                 id: user.id,
                 username: user.username,
-                email: user.email,
+                role: user.role
             };
         }
 

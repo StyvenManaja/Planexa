@@ -49,4 +49,25 @@ const checkAvailableSlot = async (req, res) => {
     }
 };
 
-module.exports = { bookingARoom, checkAvailableSlot };
+/**
+ * Contrôleur pour récuperer les créservations d'un utilisateur.
+ * Récupère les réservations depuis les paramètres, puis appelle le service.
+ */
+const getMyBooking = async (req, res) => {
+    try {
+        const { id } = req.user;
+        const allBooking = await bookingService.getMyBooking(id);
+
+        if(!allBooking) {
+            return res.status(400).json({ message: 'No booking found for this user.' });
+        }
+
+        res.status(200).json({ allBooking });
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+        res.status(500).json({ message: `Server error: ${error.message}` });
+    }
+}
+
+
+module.exports = { bookingARoom, checkAvailableSlot, getMyBooking };

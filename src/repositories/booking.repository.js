@@ -55,4 +55,21 @@ const checkAvailableSlot = async (roomId, date) => {
     }
 }
 
-module.exports = { bookingARoom, checkAvailableSlot };
+/**
+ * Récuperer toute les réservations d'un utilisateur authentifié
+ * @param {String} userId - ID de l'utilisateur
+ * @returns {Array|null} - Les réservations de l'utilisateur
+ */
+const getMyBooking = async (userId) => {
+    try {
+        //récuperer les réservations depuis la base via l'userId
+        const allBooking = await Booking.find({ userId: userId });
+        if(!allBooking || allBooking.length === 0) return null;    // si pas de résa trouver, on renvoi rien
+        return allBooking;
+    } catch (error) {
+        console.log('Error on finding all booking for the user: ' + error.message);
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { bookingARoom, checkAvailableSlot, getMyBooking };
