@@ -4,10 +4,25 @@ const Room = require('../models/Room');
 /**
  * Crée une réservation pour un utilisateur dans une salle à une date et créneaux donnés.
  * @param {Object} bookingData - { userId, roomId, date, timeSlots }
- * @returns {Object} - La réservation créée
+ * @returns {Object|Null} - La réservation créée ou null
  */
 const bookingARoom = async (bookingData) => {
     try {
+        /*
+        Vérifier tout d'abord si la salle a déjà un résa à la date donné
+        Si oui, comparer les horaires du résa qui est déjà fait et les horaires du nouveau résa
+            S'il y a un ou plusieurs créneaux déjà pris dans le premier résa, renvoi null et interrompre le programme
+            (et de toute façon ça n'arrivera jamais car depuis le frontend, on appelera toujours le controlleur pour vérifier la disponibilité de la salle à la date donner mais c'est juste par sécurité que je doit faire ça)
+        Si non, bah on continuer avec le code en bas     
+        */
+        const conflict = await Booking.findOne({
+            roomId: bookingData.roomId,
+            date: bookingData.date,
+            timeSlots: { $in: bookingData.timeSlots }
+        })
+
+        if(conflict) return null;
+
         // Création de la réservation dans la base
         const booked = await Booking.create({
             userId: bookingData.userId,
@@ -72,4 +87,52 @@ const getMyBooking = async (userId) => {
     }
 }
 
-module.exports = { bookingARoom, checkAvailableSlot, getMyBooking };
+/**
+ * Récuperer les réservations disponible (Spécial Admin)
+ * @returns {Array|null} - La liste des réservation dispo qui sont en status confirmé et qui son encore à vénir
+ */
+const getConfirmedBooking = async () => {
+    try {
+        const today = new Date();
+        const bookingArray = await Booking.find({
+            date: { $gt: today },
+            status: "confirmed"
+        })
+        if(!bookingArray || bookingArray.length === 0) return null;
+        return bookingArray;
+    } catch (error) {
+        console.log('Error on finding all confirmed booking: ' + error.message);
+        throw new Error(error.message);
+    }
+}
+
+/**
+ * Annuler un résa éffectué à condition que ce n'est pas encore aujourd'hui
+ * @param {bookingId} - On annule le résa avec son ID
+ * @returns {Object|null} - Retourne le résa annuler
+ */
+
+const cancelBooking = async (bookingId, userId) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const canceledBooking = await Booking.findOneAndUpdate({
+            _id: bookingId,
+            userId: userId,
+            date: { $gt: today }
+        },
+        {
+            status: 'canceled'
+        },
+        { new: true }
+    )
+
+        if(!canceledBooking) return null;
+        return canceledBooking;
+    } catch (error) {
+        console.log('Error on canceling the booking: ' + error.message);
+        throw new Error(error.message);
+    }
+}
+
+module.exports = { bookingARoom, checkAvailableSlot, getMyBooking, getConfirmedBooking, cancelBooking };

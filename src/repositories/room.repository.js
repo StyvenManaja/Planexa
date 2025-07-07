@@ -34,6 +34,25 @@ const getAllRoom = async () => {
 };
 
 /**
+ * Mettre à jours les données d'une salle par son ID
+ * @param {Object} roomUpdatedData - Les nouvelles valeurs de la salle
+ * @throws {Error} si erreur lors de la mise à jours
+ * @returns {Promise<Object>} la salle mis à jours
+ */
+const updateRoom = async (roomUpdatedData) => {
+    try {
+        const updatedRoom = await Room.findByIdAndUpdate(roomUpdatedData.id, {
+            name: roomUpdatedData.name,
+            volume: roomUpdatedData.volume,
+            equipments: roomUpdatedData.equipments
+        })
+        return updatedRoom;
+    } catch (error) {
+        throw new Error(`Error on updating the room: ${error.message}`);
+    }
+}
+
+/**
  * Supprime une salle par son ID
  * @param {String} id - ID MongoDB de la salle
  * @returns {Promise<Boolean>} true si suppression OK
@@ -51,4 +70,4 @@ const deleteRoom = async (id) => {
     }
 };
 
-module.exports = { createRoom, getAllRoom, deleteRoom };
+module.exports = { createRoom, getAllRoom, updateRoom, deleteRoom };

@@ -35,4 +35,26 @@ const getMyBooking = async (roomId) => {
     }
 }
 
-module.exports = { bookingARoom, checkAvailableSlot, getMyBooking };
+// Récuperer les réservations confirmé
+const getConfirmedBooking = async () => {
+    try {
+        // Appel au repository pour récuperer les résa
+        return await bookingRepository.getConfirmedBooking();
+    } catch (error) {
+        console.error('Error on finding all booking:', error.message);
+        throw new Error(error.message);        
+    }
+}
+
+// Annuler un réservation
+const cancelBooking = async (bookingId, userId) => {
+    try {
+        // Appel au repository pour annuler le résa
+        return await bookingRepository.cancelBooking(bookingId, userId);
+    } catch (error) {
+        console.error('Error on canceling the booking:', error.message);
+        throw new Error(error.message); 
+    }
+}
+
+module.exports = { bookingARoom, checkAvailableSlot, getMyBooking, getConfirmedBooking, cancelBooking };

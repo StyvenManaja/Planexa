@@ -41,6 +41,23 @@ const getAllRoom = async (req, res) => {
 };
 
 /**
+ * Mettre à jours les données d'une salle
+ * Retourne rien si la mise à jours échoue
+ */
+const updateRoom = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, volume, equipments } = req.body;
+        const updatedRoom = await roomService.updateRoom(id, name, volume, equipments);
+        if(!updatedRoom) return res.status(400).json({ message: 'Cannot update the room.' });
+        return res.status(200).json({ message: "Room updated." });
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+        res.status(500).json({ message: `Server error: ${error.message}` });
+    }
+}
+
+/**
  * Supprime une salle via son ID (fourni dans les params).
  * Retourne un message de succès ou une erreur si l’ID est invalide ou introuvable.
  */
@@ -60,4 +77,4 @@ const deleteRoom = async (req, res) => {
     }
 };
 
-module.exports = { createRoom, getAllRoom, deleteRoom };
+module.exports = { createRoom, getAllRoom, updateRoom, deleteRoom };

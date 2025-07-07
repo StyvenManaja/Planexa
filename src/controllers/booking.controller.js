@@ -1,4 +1,5 @@
 const bookingService = require('../services/booking.service');
+const normalizeDate = require('../utils/normalizeDate');;
 
 /**
  * Contrôleur pour réserver une salle.
@@ -11,7 +12,10 @@ const bookingARoom = async (req, res) => {
         const id = req.params.roomId;
         const { date, timeSlots } = req.body;
 
-        const booked = await bookingService.bookingARoom(userId, id, date, timeSlots);
+        // Transformer la date avec l'heure par defalut avant l'enregistrement
+        const dateNormalized = normalizeDate(date);
+
+        const booked = await bookingService.bookingARoom(userId, id, dateNormalized, timeSlots);
 
         if (!booked) {
             return res.status(400).json({ message: 'Cannot book the room.' });
@@ -36,7 +40,10 @@ const checkAvailableSlot = async (req, res) => {
         const { roomId } = req.params;
         const { date } = req.query;
 
-        const availableSlot = await bookingService.checkAvailableSlot(roomId, date);
+        // Vérifier la date avec l'heure par default
+        const dateNormalized = normalizeDate(date);
+
+        const availableSlot = await bookingService.checkAvailableSlot(roomId, dateNormalized);
 
         if (!availableSlot) {
             return res.status(400).json({ message: 'No available slot on that date.' });
@@ -69,5 +76,31 @@ const getMyBooking = async (req, res) => {
     }
 }
 
+// Récuperer les réservations confirmé qui sont à vénir
+const getConfirmedBooking = async (req, res) => {
+    try {
+        const confirmedBooking = await bookingService.getConfirmedBooking();
+        if(!confirmedBooking) return res.status(400).json({ message: 'No confirmed booking found.' });
 
-module.exports = { bookingARoom, checkAvailableSlot, getMyBooking };
+        res.status(200).json({ confirmedBooking });
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+        res.status(500).json({ message: `Server error: ${error.message}` });        
+    }
+}
+
+// Annuler un résa avec son ID à condition que la date du résa n'est pas encore passé ou aujourd'hui
+const cancelBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        const canceledBooking = await bookingService.cancelBooking(id, userId);
+        if(!canceledBooking) return res.status(400).json({ message: 'Cannot cancel the booking.' });
+        res.status(200).json({ canceledBooking });
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+        res.status(500).json({ message: `Server error: ${error.message}` });        
+    }
+}
+
+module.exports = { bookingARoom, checkAvailableSlot, getMyBooking, getConfirmedBooking, cancelBooking };

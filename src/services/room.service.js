@@ -4,7 +4,7 @@ const createRoom = async (name, volume, equipments) => {
     try {
         const roomData = { name, volume, equipments };
         const room = await roomRepository.createRoom(roomData);
-        // Si création échoue, retourne null (ou on peut même lancer une erreur, selon ton besoin)
+        // Si création échoue, retourne null
         return room || null;
     } catch (error) {
         console.error('Error occurred when registering room:', error.message);
@@ -23,6 +23,18 @@ const getAllRoom = async () => {
     }
 }
 
+const updateRoom = async (id, name, volume, equipments) => {
+    try {
+        const roomUpdatedData = { id, name, volume, equipments };
+        const updatedRoom = await roomRepository.updateRoom(roomUpdatedData);
+        // Si la mise à jours échoue, retourne null
+        return updatedRoom || null;
+    } catch (error) {
+        console.error('Error occurred when updating the rooms:', error.message);
+        throw new Error(error.message);
+    }
+}
+
 const deleteRoom = async (id) => {
     try {
         const deleted = await roomRepository.deleteRoom(id);
@@ -34,4 +46,4 @@ const deleteRoom = async (id) => {
     }
 }
 
-module.exports = { createRoom, getAllRoom, deleteRoom };
+module.exports = { createRoom, getAllRoom, updateRoom, deleteRoom };
